@@ -556,6 +556,9 @@ export class PowerFlowCardPlus extends LitElement {
     const initialNumericState = null as null | number;
     const grid: GridObject = {
       entity: entities.grid?.entity,
+      unit: entities.grid?.unit_of_measurement,
+      unit_white_space: entities.grid?.unit_white_space,
+      decimals: entities.grid?.decimals,
       has: entities?.grid?.entity !== undefined,
       hasReturnToGrid:
         typeof entities.grid?.entity === "string" || !!entities.grid?.entity?.production,
@@ -624,6 +627,9 @@ export class PowerFlowCardPlus extends LitElement {
       has: hasSolarEntity && displayZero,
       state: {
         total: getSolarState(this.hass, this._config),
+        unit: entities.solar?.unit_of_measurement,
+        unit_white_space: entities.solar?.unit_white_space,
+        decimals: entities.solar?.decimals,
         toHome: initialNumericState,
         toGrid: initialNumericState,
         toBattery: initialNumericState,
@@ -660,6 +666,9 @@ export class PowerFlowCardPlus extends LitElement {
     };
     const battery = {
       entity: entities.battery?.entity,
+      unit: entities.battery?.unit_of_measurement,
+      unit_white_space: entities.battery?.unit_white_space,
+      decimals: entities.battery?.decimals,
       has: checkIfHasBattery(),
       mainEntity:
         typeof entities.battery?.entity === "object"

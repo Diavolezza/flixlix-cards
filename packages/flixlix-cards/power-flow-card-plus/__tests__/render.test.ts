@@ -75,6 +75,8 @@ declare function computeRenderDataShape(): {
   individualObjs: Array<{ has: boolean; state: number | null }>;
 };
 
+type UnitFields = { unit?: string; unit_white_space?: boolean; decimals?: number };
+
 describe("render", () => {
   test("renders correctly", () => {
     const config = {
@@ -193,5 +195,41 @@ describe("_computeRenderData", () => {
     expect(Number.isNaN(data.grid.state.toBattery)).toBe(false);
     expect(Number.isNaN(data.grid.state.toHome)).toBe(false);
     expect(Number.isNaN(data.solar.state.total)).toBe(false);
+  });
+
+  test("case 6: unit_of_measurement, unit_white_space and decimals reach grid, battery and solar", () => {
+    const config = {
+      type: "custom:power-flow-card-plus",
+      entities: {
+        grid: {
+          entity: "sensor.grid",
+          unit_of_measurement: "L/min",
+          unit_white_space: false,
+          decimals: 1,
+        },
+        solar: { entity: "sensor.solar", unit_of_measurement: "L/min", decimals: 2 },
+        battery: {
+          entity: { consumption: "sensor.tank_out", production: "sensor.tank_in" },
+          state_of_charge: "sensor.tank_level",
+          unit_of_measurement: "L/min",
+        },
+      },
+    } as PowerFlowCardPlusConfig;
+    const hass = makeHass({
+      "sensor.grid": "5",
+      "sensor.solar": "0",
+      "sensor.tank_out": "2",
+      "sensor.tank_in": "0",
+      "sensor.tank_level": "80",
+    });
+    const card = makeCard(config, hass);
+    const data = card._computeRenderData() as any;
+
+    expect((data.grid as UnitFields).unit).toBe("L/min");
+    expect((data.grid as UnitFields).unit_white_space).toBe(false);
+    expect((data.grid as UnitFields).decimals).toBe(1);
+    expect((data.battery as UnitFields).unit).toBe("L/min");
+    expect((data.solar.state as UnitFields).unit).toBe("L/min");
+    expect((data.solar.state as UnitFields).decimals).toBe(2);
   });
 });
